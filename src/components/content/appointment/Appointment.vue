@@ -26,12 +26,12 @@
                :sort-desc.sync="sortDesc"
                @filtered="onFiltered"
       >
-        <template slot="praticient" slot-scope="row">
-          <span v-if="row.item.content.participant[1] != 'null'">{{row.item.content.participant[1].actor.display}}</span>
+        <!--<template slot="praticient" slot-scope="row">
+          <span v-if="row.item.content.participant !== ''">{{row.item.content.participant.actor.display}}</span>
         </template>
         <template slot="patient" slot-scope="row">
           <span v-if="row.item.content.participant[0] != 'null'">{{row.item.content.participant[0].actor.display}}</span>
-        </template>
+        </template>-->
         <template slot="description" slot-scope="row">{{row.item.content.description}}</template>
         <template slot="start" slot-scope="row">{{row.item.content.start}}</template>
         <template slot="end" slot-scope="row">{{row.item.content.end}}</template>
@@ -41,8 +41,8 @@
             <a class="btn btn-xs btn-primary" href="#fade" data-hover="Fade" @click="clickItem(row, 'show', 'appointment')"><span class="glyphicon glyphicon-search white"></span></a>
           </span>
           <span v-if="row.item.content.status != 'booked' && row.item.content.status == 'proposed'">
-            <a class="btn btn-xs btn-success" href="#fade" data-hover="Fade" @click="clickItem(row, 'edit', 'appointment')"><span class="glyphicon glyphicon-ok white"></span></a>
-            <a class="btn btn-xs btn-danger" href="#fadeDelete" data-hover="FadeDelete" @click="clickItem(row, 'delete', 'appointment')"><span class="glyphicon glyphicon-remove white"></span></a>
+            <a class="btn btn-xs btn-success" href="#/rendez-vous" data-hover="Fade" @click="postAppointmentRequest(row, 'accepted')"><span class="glyphicon glyphicon-ok white"></span></a>
+            <a class="btn btn-xs btn-danger" href="#/rendez-vous" data-hover="FadeDelete" @click="postAppointmentRequest(row, 'declined')"><span class="glyphicon glyphicon-remove white"></span></a>
           </span>
         </template>
       </b-table>
@@ -61,19 +61,14 @@
 <script>
 import axios from 'axios'
 export default {
-  name: 'table-appointments',
+  participant: 'table-appointments',
   data () {
     return {
       items: [],
       fields: {
-        praticient: {
+        name: {
           label: 'Praticient',
-          'class': 'text-center'
-        },
-        patient: {
-          label: 'Patient',
-          key: 'patient',
-          sortable: true,
+          key: 'praticient',
           'class': 'text-center'
         },
         description: {
@@ -142,10 +137,9 @@ export default {
       this.isBusy = true
       var token = 'JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImVzZmVzZmVzZ2VzZXMiLCJmdWxsTmFtZSI6IlRlc3QxIiwiX2lkIjoiNTljYTcwM2MzODJjYmUwNjQwY2FmZGQ0IiwiaWF0IjoxNTA2NDM5MzQxfQ.ty46L_-y5FmItHu1I0Wv9TcBfciaLGu_9PdajKWUyas'
       let promise = axios.get('http://62.210.38.108/fhir/core/api/appointment/', {headers: { 'Authorization': token }})
-
       return promise.then(response => {
         this.isBusy = false
-        console.log(response)
+        // console.log(response)
         const items = response.data.entry
         this.totalRows = items.length
         return (items)
@@ -155,6 +149,82 @@ export default {
         console.log(error.response)
         return []
       })
+    },
+    postAppointmentRequest (apt, reponse) {
+      var obj = apt.item.content
+
+      var resource = {
+        'resourceType': 'AppointmentResponse',
+        'id': '',
+        'text': {
+          'status': reponse,
+          'div': ''
+        },
+        'identifier': [
+          {
+            'system': '',
+            'value': ''
+          }
+        ],
+        'appointment': {
+          'reference': obj._id,
+          'display': obj.description === 'undefined' ? '' : obj.description
+        },
+        'start': obj.start === 'undefined' ? '' : obj.start,
+        'end': obj.end === 'undefined' ? '' : obj.end,
+        'participantType': [{}],
+        'actor': {
+          'reference': obj.participant[1].actor === 'undefined' ? '' : obj.participant[1].actor,
+          'display': 'TEST2'
+        },
+        'participantStatus': reponse,
+        'comment': obj.comment === 'undefined' ? '' : obj.comment
+      }
+
+      var token =
+        'JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImVzZmVzZmVzZ2VzZXMiLCJmdWxsTmFtZSI6IlRlc3QxIiwiX2lkIjoiNTljYTcwM2MzODJjYmUwNjQwY2FmZGQ0IiwiaWF0IjoxNTA2NDM5MzQxfQ.ty46L_-y5FmItHu1I0Wv9TcBfciaLGu_9PdajKWUyas'
+      axios
+        .post(
+          'http://62.210.38.108/fhir/core/api/appointmentresponse/create',
+          resource,
+          { headers: { Authorization: token } }
+        )
+        .then(response => {
+          this.showSuccess = true
+          this.dismissCountDownSuccess = this.dismissSecs
+          Object.assign(this.$data, this.$options.data.call(this))
+          this.updateAppointment(apt, reponse)
+        })
+        .catch(e => {
+          this.dismissCountDownError = this.dismissSecs
+          this.errors.push(e)
+          alert('appointmentResponse n\'a pas pu être envoyé')
+        })
+    },
+    updateAppointment (apt, reponse) {
+      var obj = apt.item.content
+
+      obj.status = (reponse === 'accepted' ? 'booked' : 'cancelled')
+
+      var token =
+        'JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImVzZmVzZmVzZ2VzZXMiLCJmdWxsTmFtZSI6IlRlc3QxIiwiX2lkIjoiNTljYTcwM2MzODJjYmUwNjQwY2FmZGQ0IiwiaWF0IjoxNTA2NDM5MzQxfQ.ty46L_-y5FmItHu1I0Wv9TcBfciaLGu_9PdajKWUyas'
+      axios
+        .put(
+          'http://62.210.38.108/fhir/core/api/appointment/update/' + obj._id,
+          obj,
+          { headers: { Authorization: token } }
+        )
+        .then(response => {
+          this.showSuccess = true
+          this.dismissCountDownSuccess = this.dismissSecs
+          Object.assign(this.$data, this.$options.data.call(this))
+          this.$root.$emit('bv::refresh::table', 'appointment-table')
+        })
+        .catch(e => {
+          this.dismissCountDownError = this.dismissSecs
+          this.errors.push(e)
+          alert('appointment n\'a pas pu être mis à jour')
+        })
     }
   }
 }

@@ -111,6 +111,24 @@
                       </div>
                   </div>
                 </b-tab>
+                <b-tab title="Planning">
+                  <div class="row" >
+                    <div class="col-sm-12">
+                    <div class="list-group">
+                      <a href="#" class="list-group-item">
+                        <div class="row">
+                          <div class="col-sm-12">1</div>
+                        </div>
+                      </a>
+                      <a href="#" class="list-group-item">
+                        <div class="row">
+                          <div class="col-sm-12">2</div>
+                        </div>
+                      </a>
+                    </div>
+                  </div>
+                  </div>
+                </b-tab>
                </b-tabs>
             </b-card>
           </div>
