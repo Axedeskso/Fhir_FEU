@@ -1,8 +1,11 @@
 <template>
   <div id="main">
+  <!--<b-container fluid>-->
+
     <Header/>
     <router-view/>
     <LateralMenu/>
+<!--</b-container>-->
   </div>
 </template>
 

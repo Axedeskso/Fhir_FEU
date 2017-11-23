@@ -1,5 +1,37 @@
 <template>
   <div id="nav">
+<!--
+<b-navbar toggleable="md" type="dark" variant="info">
+  <b-navbar-toggle target="nav_collapse"></b-navbar-toggle>
+  <b-navbar-brand href="#">     Application Praticient</b-navbar-brand>
+  <b-collapse is-nav id="nav_collapse">
+    <b-navbar-nav>
+      <b-nav-item href="#">
+        <div class="smaller">
+          <img src="../../assets/doctor01.svg">
+          <img src="../../assets/doctor02.svg">
+          <img src="../../assets/doctor03.svg">
+          <img src="../../assets/doctor04.svg">
+          <img src="../../assets/doctor05.svg">
+        </div>
+      </b-nav-item>
+    </b-navbar-nav>
+    <b-navbar-nav class="ml-auto">
+      <b-nav-item right>
+        <b-row>
+          <b-col sm="1">
+            <a class="fhir" href="https://www.hl7.org/fhir/">
+            <img class="fhir-img" src="../../assets/fhir_logo.png">
+            </a>
+          </b-col>
+        </b-row>
+      </b-nav-item>
+    </b-navbar-nav>
+  </b-collapse>
+</b-navbar>
+
+
+  -->
     <b-container fluid>
       <b-row>
         <b-col sm="1">

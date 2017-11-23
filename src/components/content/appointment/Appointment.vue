@@ -26,22 +26,20 @@
                :sort-desc.sync="sortDesc"
                @filtered="onFiltered"
       >
-        <!-- Pour eviter l'erreur commenter d'ici -->
-        <template slot="praticient" slot-scope="row">
-           <span v-if="row.item.content.participant.length > 1">{{row.item.content.participant[1].actor.display}}</span>
+      <!--
+        <template slot="participant" slot-scope="row">
+          <span v-if="row.item.content.participant !== 'null'">{{row.item.content.participant[1].actor.display}}</span>
         </template>
         <template slot="patient" slot-scope="row">
-          <span v-if="row.item.content.participant != null">{{row.item.content.participant[0].actor.display}}</span>
-        </template>
-        <!-- Jusque là -->
-
+          <span v-if="row.item.content.participant[0] != 'null'">{{row.item.content.participant[0].actor.display}}</span>
+        </template>-->
         <template slot="description" slot-scope="row">{{row.item.content.description}}</template>
         <template slot="start" slot-scope="row">{{row.item.content.start}}</template>
         <template slot="end" slot-scope="row">{{row.item.content.end}}</template>
         <template slot="status" slot-scope="row">{{row.item.content.status}}</template>
         <template slot="actions" slot-scope="row">
           <span v-if="row.item.content.status == 'booked' && row.item.content.status != 'proposed'">
-            <a class="btn btn-xs btn-primary" href="#/rendez-vous" data-hover="Fade" ><span class="glyphicon glyphicon-search white"></span></a>
+            <a class="btn btn-xs btn-primary" href="#fade" data-hover="Fade" @click="clickItem(row, 'show', 'appointment')"><span class="glyphicon glyphicon-search white"></span></a>
           </span>
           <span v-if="row.item.content.status != 'booked' && row.item.content.status == 'proposed'">
             <a class="btn btn-xs btn-success" href="#/rendez-vous" data-hover="Fade" @click="postAppointmentRequest(row, 'accepted')"><span class="glyphicon glyphicon-ok white"></span></a>
@@ -55,6 +53,7 @@
           <b-pagination  class="pag-tab" :total-rows="totalRows" :per-page="perPage" v-model="currentPage" />
         </div>
       </div>
+
       </div>
     </div>
   </div>
@@ -68,16 +67,14 @@ export default {
     return {
       items: [],
       fields: {
+        participant: {
+          label: 'Participant',
+          key: 'participant',
+          'class': 'text-center'
+        },
         patient: {
           label: 'Patient',
           key: 'patient',
-          sortable: true,
-          'class': 'text-center'
-        },
-        praticient: {
-          label: 'Praticient',
-          key: 'praticient',
-          sortable: true,
           'class': 'text-center'
         },
         description: {
@@ -189,6 +186,7 @@ export default {
         'participantStatus': reponse,
         'comment': obj.comment === 'undefined' ? '' : obj.comment
       }
+
       var token =
         'JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImVzZmVzZmVzZ2VzZXMiLCJmdWxsTmFtZSI6IlRlc3QxIiwiX2lkIjoiNTljYTcwM2MzODJjYmUwNjQwY2FmZGQ0IiwiaWF0IjoxNTA2NDM5MzQxfQ.ty46L_-y5FmItHu1I0Wv9TcBfciaLGu_9PdajKWUyas'
       axios
